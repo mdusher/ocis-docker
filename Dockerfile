@@ -1,5 +1,5 @@
 FROM owncloud/ocis:latest
 
-ADD files/* /
+ADD files/ocis/* /
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
