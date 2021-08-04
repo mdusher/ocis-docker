@@ -22,9 +22,10 @@ done
 enabled_ext="$(echo $enabled_ext | sed 's/ /, /g')"
 log_entry "enabled extensions: $enabled_ext"
 
+# Start server
 ocis server --extensions="${enabled_ext}" &
 
-if [ "${OCIS_DISABLE_ACCOUNTS}" = "" ]; then
+if [ "${OCIS_DISABLE_ACCOUNTS}" != "true" ]; then
     log_entry "Waiting for accounts service"
     accounts_srv=1
     while [ ${accounts_srv} -ne 0 ]; do
