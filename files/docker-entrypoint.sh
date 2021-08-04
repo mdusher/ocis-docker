@@ -4,17 +4,25 @@ log_entry() {
     echo "{\"level\":\"info\",\"service\":\"docker-entrypoint\",\"time\":\"$(date +"%Y-%m-%dT%H:%M:%SZ")\",\"message\":\"${@}\"}"
 }
 
-ocis server &
+# Get list of extensions from help text
+ocis_extensions="$(ocis help | awk '{print $1}' | sed ':a;N;$!ba;s/\n/ /g' | sed 's/.*Extensions: \(.*\)Fullstack:.*/\1/g')"
 
-# Stop any services that have a OCIS_DISABLE_<service>=false environment variable set
-for srv in $(ocis list | awk '{print $2}' | grep -v "EXTENSION" | grep -v -E '^$'); do
-    uppersrv="$(log_entry ${srv} | tr [:lower:] [:upper:] | sed 's/-/_/g')"
-    disablesrv="$(printenv | grep "OCIS_DISABLE_${uppersrv}" | cut -d"=" -f2)"
-    if [ "${disablesrv}" = "true" ]; then
-	log_entry "Service '${srv}' is disabled. Killing."
-	ocis kill ${srv}
+# Generate list of extensions to use
+enabled_ext=""
+for ext in $ocis_extensions; do
+    upper_ext="$(echo ${ext} | tr [:lower:] [:upper:] | sed 's/-/_/g')"
+    disable_ext="$(printenv | grep "OCIS_DISABLE_${upper_ext}" | cut -d"=" -f2)"
+    if [ "${disable_ext}" = "true" ]; then
+        echo "Disabling '${ext}'"
+    else
+        echo "Enabling '${ext}'"
+        enabled_ext="${enabled_ext} ${ext}"
     fi
 done
+enabled_ext="$(echo $enabled_ext | sed 's/ /, /g')"
+log_entry "enabled extensions: $enabled_ext"
+
+ocis server --extensions="${enabled_ext}" &
 
 if [ "${OCIS_DISABLE_ACCOUNTS}" = "" ]; then
     log_entry "Waiting for accounts service"
