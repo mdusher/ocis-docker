@@ -1,0 +1,79 @@
+version: '3.7'
+services:
+    traefik:
+        image: traefik:v2.5
+        networks:
+          ocis-net:
+            aliases:
+              - ${OCIS_DOMAIN:-ocis.owncloud.test}
+              - ${SSP_DOMAIN:-simplesaml.owncloud.test}
+        command:
+          - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
+          - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
+          - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
+          - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
+          - "--api.dashboard=true"
+          - "--entryPoints.http.address=:80"
+          - "--entryPoints.http.http.redirections.entryPoint.to=https"
+          - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
+          - "--entryPoints.https.address=:443"
+          - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+          - "--providers.docker.exposedByDefault=false"
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+          - "certs:/certs"
+        labels:
+          - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
+          - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$apr1$4vqie50r$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
+          - "traefik.http.routers.traefik.entrypoints=https"
+          - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
+          - "traefik.http.routers.traefik.middlewares=traefik-auth"
+          - "traefik.http.routers.traefik.tls.certresolver=http"
+          - "traefik.http.routers.traefik.service=api@internal"
+        logging:
+          driver: "json-file"
+        restart: always
+    
+    simplesaml:
+        build:
+          context: .
+          dockerfile: Dockerfile.simplesamlphp
+        networks:
+          ocis-net:
+        volumes:
+        - log_data:/var/log/apache2
+        environment:
+        - SSP_HOST=${SSP_DOMAIN:-simplesaml.owncloud.test}
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.simplesaml.entrypoints=https"
+            - "traefik.http.routers.simplesaml.rule=Host(`${SSP_DOMAIN:-simplesaml.owncloud.test}`)"
+            - "traefik.http.routers.simplesaml.tls.certresolver=http"
+            - "traefik.http.routers.simplesaml.service=simplesaml"
+            - "traefik.http.services.simplesaml.loadbalancer.server.port=80"
+
+    mariadb:
+        image: mariadb:10
+        networks:
+          ocis-net:
+        environment:
+          MARIADB_DATABASE: simplesaml
+          MARIADB_USER: simplesaml
+          MARIADB_PASSWORD: simplesaml
+          MARIADB_ROOT_PASSWORD: simplesaml
+        volumes:
+        - mariadb_data:/var/lib/mariadb
+
+networks:
+    ocis-net:
+
+volumes:
+    log_data:
+        driver: local
+    certs:
+        driver: local
+    mariadb_data:
+        driver: local
