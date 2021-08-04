@@ -12,10 +12,7 @@ enabled_ext=""
 for ext in $ocis_extensions; do
     upper_ext="$(echo ${ext} | tr [:lower:] [:upper:] | sed 's/-/_/g')"
     disable_ext="$(printenv | grep "OCIS_DISABLE_${upper_ext}" | cut -d"=" -f2)"
-    if [ "${disable_ext}" = "true" ]; then
-        echo "Disabling '${ext}'"
-    else
-        echo "Enabling '${ext}'"
+    if [ "${disable_ext}" != "true" ]; then
         enabled_ext="${enabled_ext} ${ext}"
     fi
 done
