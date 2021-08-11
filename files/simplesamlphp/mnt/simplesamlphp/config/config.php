@@ -1,6 +1,6 @@
 <?php
 $config = [
-	'usenewui' => true,
+	'usenewui' => false,
     'baseurlpath' => 'https://simplesaml.owncloud.test/simplesaml/',
     'certdir' => 'cert/',
     'loggingdir' => 'log/',
@@ -134,7 +134,7 @@ $config = [
     'store.sql.dsn' => 'mysql:host=mariadb;dbname=simplesaml',
     'store.sql.username' => 'simplesaml',
     'store.sql.password' => 'simplesaml',
-    
+
     /****************************
      | OIDC module requirements |
      ***************************/
