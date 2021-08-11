@@ -10,9 +10,9 @@ $config = [
     'useridattr' => 'mail',
     'scopes' => [],
     'translate' => [
-        'sub' => ['mail'],
+        'sub' => ['eduPersonUniqueId'],
         'name' => ['cn', 'displayName', 'mail'],
-        'preferred_username' => ['mail'],
+        'preferred_username' => ['uid'], // oCIS doesn't seem to like @ in URLs for the group request, so use the uid
         'email' => ['mail'],
         'groups' => ['groups'],
     ],
