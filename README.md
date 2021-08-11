@@ -6,7 +6,8 @@ Most documentation available at https://owncloud.dev/ocis/deployment/ocis_keyclo
 
 # TODO AND KNOWN PROBLEMS
 
-* Hangs on "Redirecting" after login because 401 is returned by request for groups
+* Cannot use 'mail' as username as groups API (`/ocs/v1.php/cloud/users/einstein%40example.org/groups`) does not allow `%40`, but works if manually changed to `@`
+* Cannot logout as the oidc plugin for SimpleSAML does not provide a `end_session_endpoint`
 
 # Environment Variables
 
