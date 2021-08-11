@@ -17,12 +17,14 @@ $config = array(
 			'mail' => 'einstein@example.org',
 			'eduPersonAffiliation' => array('member'),
 			'cn' => array('Albert Einstein'),
+			'groups' => ['Users'],
 		],
 		'marie:radioactivity' => [
 			'uid' => 'marie',
 			'mail' => 'marie@example.org',
 			'eduPersonAffiliation' => array('member'),
 			'cn' => array('Marie Curie'),
+			'groups' => ['Users'],
 		],
 	],
 );
