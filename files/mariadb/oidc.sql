@@ -22,7 +22,7 @@ CREATE TABLE oidc_client (
             redirect_uri TEXT NOT NULL,
             scopes TEXT NOT NULL
         , is_enabled BOOLEAN NOT NULL DEFAULT true, is_confidential BOOLEAN NOT NULL DEFAULT false);
-INSERT INTO oidc_client VALUES('web','web','owncloud-web',replace('owncloud-web\n','\n',char(10)),'devidp','["https:\/\/ocis.owncloud.test\/oidc-callback.html"]','["openid","profile","email"]',1,1);
+INSERT INTO oidc_client VALUES('web','web','ownCloud web',replace('ownCloud web\n','\n',char(10)),'devidp','["https:\/\/ocis.owncloud.test\/oidc-callback.html"]','["openid","profile","email"]',1,0);
 INSERT INTO oidc_client VALUES('mxd5OQDk6es5LzOzRvidJNfXLUZS2oN3oUFeXPP8LpPrhx3UroJFduGEYIBOxkY1','KFeFWWEZO9TkisIQzR3fo7hfiMXlOpaqP8CFuTbSHzV1TUuGECglPxpiVKJfOXIx','ownCloud iOS app',replace('ownCloud iOS app\n','\n',char(10)),'devidp','["oc:\/\/ios.owncloud.com","oc.ios:\/\/ios.owncloud.com"]','["openid","profile","email"]',1,1);
 INSERT INTO oidc_client VALUES('e4rAsNUSIUs0lF4nbv9FmCeUkTlV9GdgTLDH1b5uie7syb90SzEVrbN7HIpmWJeD','dInFYGV33xKzhbRmpqQltYNdfLdJIfJ9L5ISoKhNoT9qZftpdWSP71VrpGR9pmoD','ownCloud Android app',replace('ownCloud Android app\n','\n',char(10)),'devidp','["oc:\/\/android.owncloud.com"]','["openid","profile","email"]',1,1);
 INSERT INTO oidc_client VALUES('xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69','UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh','ownCloud desktop client',replace('ownCloud desktop client\n','\n',char(10)),'devidp','["http:\/\/127.0.0.1:*","http://localhost:*"]','["openid","profile","email"]',1,1);
