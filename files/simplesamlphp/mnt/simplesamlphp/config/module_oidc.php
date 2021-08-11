@@ -10,11 +10,11 @@ $config = [
     'useridattr' => 'mail',
     'scopes' => [],
     'translate' => [
-        'sub' => ['sub', 'mail'],
+        'sub' => ['mail'],
         'name' => ['cn', 'displayName', 'mail'],
         'preferred_username' => ['mail'],
         'email' => ['mail'],
         'groups' => ['groups'],
     ],
-    'alwaysAddClaimsToIdToken' => false,
+    'alwaysAddClaimsToIdToken' => true,
 ];
