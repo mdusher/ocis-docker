@@ -1,8 +1,11 @@
 <?php
+
+$ssp_base_url = 'https://' . getenv('SSP_HOST') . '/simplesaml/';
+
 $config = [
 	'usenewui' => false,
-	'baseurlpath' => 'https://simplesaml.owncloud.test/simplesaml/',
-	'application' => ['baseURL' => 'https://simplesaml.owncloud.test/simplesaml/'],
+	'baseurlpath' => $ssp_base_url,
+	'application' => ['baseURL' => $ssp_base_url],
 	'certdir' => 'cert/',
 	'loggingdir' => 'log/',
 	'datadir' => 'data/',
