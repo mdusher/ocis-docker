@@ -1,8 +1,12 @@
 # oCIS Docker Image
 
-Docker image based on the ocis_keycloak deployment. 
+Docker image based on the ocis_keycloak deployment.
 
 Most documentation available at https://owncloud.dev/ocis/deployment/ocis_keycloak/ will be relevant.
+
+# TODO AND KNOWN PROBLEMS
+
+* Hangs on "Redirecting" after login because 401 is returned by request for groups
 
 # Environment Variables
 
