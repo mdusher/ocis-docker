@@ -19,3 +19,6 @@ traefik.owncloud.test 127.0.0.1
 ```
 
 Then, you can just run `docker-compose up -d` and visit https://keycloak.owncloud.test/ and accept the certificate warning before visiting https://ocis.owncloud.test/ - otherwise, you may be presented with a blank page.
+  
+## Known issues
+* If using with SELinux, you may need to run the KeyCloak and oCIS containers in privileged mode - you can do this by adding `privileged: true` to their definitions in `docker-compose.yaml`
