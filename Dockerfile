@@ -1,4 +1,4 @@
-FROM owncloud/ocis:latest
+FROM owncloud/ocis:1.11.0
 
 ADD files/ocis/* /
 

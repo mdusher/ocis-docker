@@ -1414,7 +1414,34 @@
           "certificate" : [ "MIICxzCCAa8CBgF3TRRx/zANBgkqhkiG9w0BAQsFADAnMSUwIwYDVQQDDBxvd25DbG91ZCBJbmZpbml0ZSBTY2FsZSBUZXN0MB4XDTIxMDEyOTA3MzcwMVoXDTMxMDEyOTA3Mzg0MVowJzElMCMGA1UEAwwcb3duQ2xvdWQgSW5maW5pdGUgU2NhbGUgVGVzdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ5mpHL2KWEh8OW/nfSkQN4d62Ub4p++PcO073gR2EJIJloipIgLU1W1ffQpFyT64GbRvnQei5J51inKI12FM5URf85uL2etW3krfGV6Gn2D0fdZn4ZBowXS3cEvyyDWhsk/2DUs7bM+nxHaaO9zc1cy3w1cfvAB3GS9OU6rXG9/bzP5FVTyHcCp8ZJGusvXC2t3dUJyuwNi1uK52GmivvtfZmBTLVi5dJAtnBokg/a7Yifbzad4b116i1RNs+3KXvyzX7udCEqTT/9l0odVpz1HxdQSb3eB9ZJyFOMmjDolNyNiwggKfexiCvoSySfrdJRWws08nYrlgm95sI0sUOcCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAQfVVpSE+n2E2ckp2DV9DvHYZckuHGtKx9/yP4QtkcN+A6lIDK8LsNpOmcwiepseO1C+ngekN1U9pfQ3HOLg32ft38H8CrZdY9SpmK2fWM3f+18UqZaZvr26FK+GSX4lqa+WoVqMkyW6RynS/drRp1sRRQnKKDuS5Pcu5U03v7wQU9t5h83Lexh3ZhCO5YRywQ9+clc1RtAmBMu/E8g6/CZWRIRbaEyKo2KcBV1uU3gLwlbkj8wv4BhCS7JHS/+jnQqVIXeIcD/z4u0RElJHcNtZ+d4sgby2Rd1+wbKes9gFrZoucq9ghdsOi4Q5WBN4ZcRhPrw0v2mhEc1ADCmxzjQ==" ],
           "priority" : [ "100" ]
         }
-      }, {
+      },
+      {
+        "id": "69d7f2ad-2699-47ed-ac0f-0644db33a4ec",
+        "name": "rsa",
+        "providerId": "rsa",
+        "subComponents": {},
+        "config": {
+          "privateKey": [
+            "{{ generated_private_key }}"
+          ],
+          "certificate": [
+            "{{ generated_public_key }}"
+          ],
+          "active": [
+            "true"
+          ],
+          "priority": [
+            "0"
+          ],
+          "enabled": [
+            "true"
+          ],
+          "algorithm": [
+            "RS256"
+          ]
+        }
+      },
+      {
         "id" : "f92ecf31-c3c7-4c3b-af20-839fc05bcf99",
         "name" : "hmac-generated",
         "providerId" : "hmac-generated",
