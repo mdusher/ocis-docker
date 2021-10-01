@@ -46,8 +46,8 @@ services:
   ocis:
     image: mdusher/ocis:latest
     build:
-        context: .
-        dockerfile: Dockerfile
+        context: ./ocis
+        dockerfile: files/Dockerfile
     networks:
       ocis-net:
     environment:
@@ -71,7 +71,6 @@ services:
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
     volumes:
-      - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"
@@ -104,8 +103,8 @@ services:
       ocis-net:
     entrypoint: ["/bin/sh", "/opt/jboss/tools/docker-entrypoint-override.sh"]
     volumes:
-      - ./files/keycloak/docker-entrypoint-override.sh:/opt/jboss/tools/docker-entrypoint-override.sh
-      - ./files/keycloak/ocis-realm.dist.json:/opt/jboss/keycloak/ocis-realm.dist.json
+      - ./keycloak/files/docker-entrypoint-override.sh:/opt/jboss/tools/docker-entrypoint-override.sh
+      - ./keycloak/files/ocis-realm.dist.json:/opt/jboss/keycloak/ocis-realm.dist.json
     environment:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       DB_VENDOR: POSTGRES
