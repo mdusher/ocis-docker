@@ -1,0 +1,40 @@
+#!/bin/sh
+
+config_eos() {
+	sleep 5
+	while true; do
+		eos ns | grep -c booted 2>&1 > /dev/null
+		if [ $? -eq 0 ]; then
+			break
+		fi
+		sleep 1
+	done
+
+	# If no default space defined, do full setup.
+	eos space ls default -m | grep -c default 2>&1 > /dev/null
+	if [ $? -ne 0 ]; then
+		echo "No 'default' space defined, running EOS setup"
+		eos -r 0 0 -b space define default
+		eos -r 0 0 -b vid enable sss
+		eos -r 0 0 -b vid enable unix
+		eos -r 0 0 -b vid enable https
+		eos -r 0 0 -b vid set membership daemon -uids adm
+		eos -r 0 0 -b vid set membership daemon -gids adm
+		eos -r 0 0 -b vid set membership daemon +sudo
+
+		# Add FST
+		if [ -d /disks ]; then
+			if [ ! -d /disks/eosfs1 ]; then
+				echo "Setting up FST"
+				mkdir -p /disks/eosfs1
+				chown daemon:daemon /disks/eosfs1
+				eos -r 0 0 -b fs add eosfs1 fst.${EOS_INSTANCE_NAME}:1095 /disks/eosfs1 default rw
+			fi
+		fi
+
+		eos -r 0 0 space set default on
+	fi
+}
+
+config_eos &
+exec /entrypoints/mgm

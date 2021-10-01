@@ -70,6 +70,14 @@ services:
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
+      # # eos
+      # STORAGE_DRIVER_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
+      # # common eos settings used for both drivers: eos and eoshome
+      # STORAGE_DRIVER_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.ocis-net:1094}
+      # STORAGE_DRIVER_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.ocis-net:1094}
+      # STORAGE_DRIVER_EOS_NAMESPACE: "/eos/dockertest/reva/users"
+      # # the eos end xrdcopy binaries use this env var to find the eos mgm
+      # EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm-master.ocis-net:1094}
     volumes:
       - ocis-data:/var/tmp/ocis
     labels:
@@ -139,10 +147,153 @@ services:
       driver: "json-file"
     restart: always
 
+  mq:
+    image: 'mdusher/eosdev:latest'
+    build:
+      context: ./eos
+      dockerfile: Dockerfile
+    entrypoint: /entrypoints/mq
+    tty: true
+    stdin_open: true
+    env_file:
+      - ./eos-docker.env
+    hostname: mq.ocis-net
+    networks:
+      ocis-net:
+        aliases:
+          - mq.ocis-net
+    volumes:
+      - './eos/keytabs/:/keytabs/'
+      - 'eos_logs:/var/log/eos'
+      - 'eos_config:/var/eos/config'
+      - 'eos_md:/var/eos/md'
+      - 'eos_ns_queue:/var/eos/ns-queue'
+    environment:
+      EOS_SET_MASTER: 1
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - nc -zv localhost 1097
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mgm:
+    image: 'mdusher/eosdev:latest'
+    build:
+      context: ./eos
+      dockerfile: Dockerfile
+    entrypoint: /mgm-setup-override
+    privileged: true
+    tty: true
+    stdin_open: true
+    env_file:
+      - ./eos-docker.env
+    hostname: mgm.ocis-net
+    networks:
+      ocis-net:
+        aliases:
+          - mgm.ocis-net
+    volumes:
+      - 'eos_disks:/disks'
+      - './scripts/mgm-setup-override:/mgm-setup-override'
+    volumes_from:
+      - mq
+    depends_on:
+      qdb:
+        condition: service_healthy
+    environment:
+      EOS_SET_MASTER: 1
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - eos ns | grep booted
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fst:
+    image: 'mdusher/eosdev:latest'
+    build:
+      context: ./eos
+      dockerfile: Dockerfile
+    entrypoint: /entrypoints/fst
+    tty: true
+    stdin_open: true
+    env_file:
+      - ./eos-docker.env
+    hostname: fst.ocis-net
+    networks:
+      ocis-net:
+        aliases:
+          - fst.ocis-net
+    volumes:
+      - './eos/keytabs/:/keytabs/'
+      - 'eos_logs:/var/log/eos'
+      - 'eos_disks:/disks'
+    depends_on:
+      - mgm
+    environment:
+      EOS_MGM_URL: 'root://mgm.ocis-net'
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - nc -zv localhost 1095
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  qdb:
+    image: 'mdusher/eosdev:latest'
+    build:
+      context: ./eos
+      dockerfile: Dockerfile
+    entrypoint: /entrypoints/qdb
+    tty: true
+    stdin_open: true
+    env_file:
+      - ./eos-docker.env
+    hostname: qdb.ocis-net
+    networks:
+      ocis-net:
+        aliases:
+          - qdb.ocis-net
+    depends_on:
+      - mq
+    volumes:
+      - './eos/keytabs/:/keytabs/'
+      - 'eos_logs:/var/log/eos'
+      - 'quarkdb_ns:/var/lib/quarkdb'
+    environment:
+      EOS_QDB_DIR: /var/lib/quarkdb/eosns
+      EOS_QDB_PORT: '7777'
+      EOS_QDB_MODE: raft
+      EOS_QDB_CLUSTER_ID: 3d659c1a-e70f-43f0-bed4-941a2ca0765b
+      EOS_QDB_NODES: 'qdb.ocis-net:7777'
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - '-h'
+        - localhost
+        - '-p'
+        - '7777'
+        - raft-info
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
+  eos_disks:
+  eos_md:
+  eos_ns_queue:
+  eos_config:
+  eos_logs:
+  quarkdb_ns:
   certs:
   ocis-data:
   keycloak_postgres_data:
+
 
 networks:
   ocis-net:
