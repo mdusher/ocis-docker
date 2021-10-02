@@ -1,5 +1,9 @@
 #!/bin/sh
 
+log_info() {
+	echo "[INFO] ${@}"
+}
+
 config_eos() {
 	sleep 5
 	while true; do
@@ -9,11 +13,11 @@ config_eos() {
 		fi
 		sleep 1
 	done
-
+	log_info "configuring EOS"
 	# If no default space defined, do full setup.
 	eos space ls default -m | grep -c default 2>&1 > /dev/null
 	if [ $? -ne 0 ]; then
-		echo "No 'default' space defined, running EOS setup"
+		log_info "no 'default' space defined, running EOS setup"
 		eos -r 0 0 -b space define default
 		eos -r 0 0 -b vid enable sss
 		eos -r 0 0 -b vid enable unix
@@ -25,15 +29,28 @@ config_eos() {
 		# Add FST
 		if [ -d /disks ]; then
 			if [ ! -d /disks/eosfs1 ]; then
-				echo "Setting up FST"
+				log_info "setting up FST"
 				mkdir -p /disks/eosfs1
 				chown daemon:daemon /disks/eosfs1
 				eos -r 0 0 -b fs add eosfs1 fst.${EOS_INSTANCE_NAME}:1095 /disks/eosfs1 default rw
 			fi
 		fi
 
+		if [ "${COMPOSE_PROJECT_NAME}" != "" ]; then
+			# Allow the ocis container to use EOS
+			eos -r 0 0 vid set map -tident *@${COMPOSE_PROJECT_NAME}_ocis_1.${COMPOSE_PROJECT_NAME}_ocis-net vuid:2 vgid:2
+		fi
+
 		eos -r 0 0 space set default on
 	fi
+
+	eos -r 0 0 -b mkdir -p /eos/ocis-net/reva/users
+	eos -r 0 0 -b chown daemon:daemon /eos/ocis-net/reva/users
+
+	eos -r 0 0 -b mkdir -p /eos/ocis-net/ocis/metadata
+	eos -r 0 0 -b chown daemon:daemon /eos/ocis-net/ocis/metadata
+
+	log_info "configuration completed"
 }
 
 config_eos &
