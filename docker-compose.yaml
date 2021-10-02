@@ -1,5 +1,5 @@
 ---
-version: "3.7"
+version: "3.9"
 
 services:
   traefik:
@@ -30,7 +30,7 @@ services:
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "certs:/certs"
+      - "ocis_certs:/certs"
     labels:
       - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$apr1$4vqie50r$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
@@ -47,9 +47,10 @@ services:
     image: mdusher/ocis:latest
     build:
         context: ./ocis
-        dockerfile: files/Dockerfile
+        dockerfile: Dockerfile
     networks:
       ocis-net:
+    #entrypoint: sleep 100000
     environment:
       # Keycloak IDP specific configuration
       OCIS_DISABLE_IDP: "true"
@@ -71,15 +72,26 @@ services:
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       # # eos
-      # STORAGE_DRIVER_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
-      # # common eos settings used for both drivers: eos and eoshome
-      # STORAGE_DRIVER_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm-master.ocis-net:1094}
-      # STORAGE_DRIVER_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm-master.ocis-net:1094}
-      # STORAGE_DRIVER_EOS_NAMESPACE: "/eos/dockertest/reva/users"
-      # # the eos end xrdcopy binaries use this env var to find the eos mgm
-      # EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm-master.ocis-net:1094}
+      # ACCOUNTS_SERVICE_USER_USERNAME: daemon
+      # ACCOUNTS_SERVICE_USER_UID: 2
+      # ACCOUNTS_SERVICE_USER_GID: 2
+      # dont think these are required when using keycloak?
+      # STORAGE_METADATA_DRIVER: eos  
+      # STORAGE_METADATA_ROOT: /eos/ocis-net/ocis/metadata
+      # STORAGE_DRIVER_EOS_FORCE_SINGLEUSER_MODE: "true"
+      # STORAGE_DRIVER_EOS_SINGLE_USERNAME: daemon
+
+      # home storage driver
+      STORAGE_HOME_DRIVER: eoshome
+      STORAGE_DRIVER_EOS_LAYOUT: "{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"
+      # common eos settings used for both drivers: eos and eoshome
+      STORAGE_DRIVER_EOS_MASTER_URL: ${EOS_MGM_URL:-root://mgm.ocis-net:1094}
+      STORAGE_DRIVER_EOS_SLAVE_URL: ${EOS_MGM_URL:-root://mgm.ocis-net:1094}
+      STORAGE_DRIVER_EOS_NAMESPACE: "/eos/ocis-net/reva/users"
+      # the eos end xrdcopy binaries use this env var to find the eos mgm
+      EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm.ocis-net:1094}
     volumes:
-      - ocis-data:/var/tmp/ocis
+      - ocis_data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
@@ -96,7 +108,7 @@ services:
     networks:
       ocis-net:
     volumes:
-      - keycloak_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
@@ -156,7 +168,7 @@ services:
     tty: true
     stdin_open: true
     env_file:
-      - ./eos-docker.env
+      - ./config/eos-docker.env
     hostname: mq.ocis-net
     networks:
       ocis-net:
@@ -187,8 +199,10 @@ services:
     privileged: true
     tty: true
     stdin_open: true
+    environment: 
+      COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME}"
     env_file:
-      - ./eos-docker.env
+      - ./config/eos-docker.env
     hostname: mgm.ocis-net
     networks:
       ocis-net:
@@ -196,7 +210,7 @@ services:
           - mgm.ocis-net
     volumes:
       - 'eos_disks:/disks'
-      - './scripts/mgm-setup-override:/mgm-setup-override'
+      - './config/mgm-setup-override:/mgm-setup-override'
     volumes_from:
       - mq
     depends_on:
@@ -221,7 +235,7 @@ services:
     tty: true
     stdin_open: true
     env_file:
-      - ./eos-docker.env
+      - ./config/eos-docker.env
     hostname: fst.ocis-net
     networks:
       ocis-net:
@@ -252,7 +266,7 @@ services:
     tty: true
     stdin_open: true
     env_file:
-      - ./eos-docker.env
+      - ./config/eos-docker.env
     hostname: qdb.ocis-net
     networks:
       ocis-net:
@@ -290,9 +304,9 @@ volumes:
   eos_config:
   eos_logs:
   quarkdb_ns:
-  certs:
-  ocis-data:
-  keycloak_postgres_data:
+  ocis_certs:
+  ocis_data:
+  postgres_data:
 
 
 networks:
