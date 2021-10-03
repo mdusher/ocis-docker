@@ -218,6 +218,7 @@ services:
         condition: service_healthy
     environment:
       EOS_SET_MASTER: 1
+      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME}
     healthcheck:
       test:
         - CMD-SHELL
