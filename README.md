@@ -1,6 +1,6 @@
 # oCIS Docker Image
 
-Docker image based on the ocis_keycloak deployment. 
+Docker image based on the ocis_keycloak deployment.
 
 Most documentation available at https://owncloud.dev/ocis/deployment/ocis_keycloak/ will be relevant.
 
@@ -18,7 +18,9 @@ ocis.owncloud.test 127.0.0.1
 traefik.owncloud.test 127.0.0.1
 ```
 
-Then, you can just run `docker-compose up -d` and visit https://keycloak.owncloud.test/ and accept the certificate warning before visiting https://ocis.owncloud.test/ - otherwise, you may be presented with a blank page.
-  
+Then, you can
+Then, you can just run `docker-compose up --build -d` and visit https://keycloak.owncloud.test/ and accept the certificate warning before visiting https://ocis.owncloud.test/ - otherwise, you may be presented with a blank page.
+
 ## Known issues
 * If using with SELinux, you may need to run the KeyCloak and oCIS containers in privileged mode - you can do this by adding `privileged: true` to their definitions in `docker-compose.yaml`
+* Sharing does not appear to work

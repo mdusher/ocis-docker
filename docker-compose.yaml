@@ -50,7 +50,6 @@ services:
         dockerfile: Dockerfile
     networks:
       ocis-net:
-    #entrypoint: sleep 100000
     environment:
       # Keycloak IDP specific configuration
       OCIS_DISABLE_IDP: "true"
@@ -76,7 +75,7 @@ services:
       # ACCOUNTS_SERVICE_USER_UID: 2
       # ACCOUNTS_SERVICE_USER_GID: 2
       # dont think these are required when using keycloak?
-      # STORAGE_METADATA_DRIVER: eos  
+      # STORAGE_METADATA_DRIVER: eos
       # STORAGE_METADATA_ROOT: /eos/ocis-net/ocis/metadata
       # STORAGE_DRIVER_EOS_FORCE_SINGLEUSER_MODE: "true"
       # STORAGE_DRIVER_EOS_SINGLE_USERNAME: daemon
@@ -199,8 +198,6 @@ services:
     privileged: true
     tty: true
     stdin_open: true
-    environment: 
-      COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME}"
     env_file:
       - ./config/eos-docker.env
     hostname: mgm.ocis-net
