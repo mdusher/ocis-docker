@@ -2,7 +2,7 @@
 
 error_reporting(E_ALL);
 
-include_once "/mnt/simplesaml/lib/_autoload.php";
+include_once "/mnt/simplesamlphp/lib/_autoload.php";
 $auth = new \SimpleSAML\Auth\Simple("default-sp");
 
 if ($_REQUEST['logout'] === 'true' && $auth->isAuthenticated()) {
