@@ -36,6 +36,7 @@ RUN apk --no-cache add \
     php7-xmlwriter \
 	php7-xml \
 	php7-xmlrpc \
+	php7-sodium \
 	&& rm -f /var/cache/apk/* \
 	&& mkdir -p /usr/local/apache2/htdocs/ && \
 	sed -i 's#^DocumentRoot ".*#DocumentRoot "/usr/local/apache2/htdocs"#g' /etc/apache2/httpd.conf && \
@@ -53,7 +54,7 @@ RUN cd /tmp && \
 	tar xzf /tmp/ssp.tar.gz && \
 	mv simplesamlphp-1.19.1 /mnt/simplesamlphp && \
 	cd /mnt/simplesamlphp && \
-    composer require rediris-es/simplesamlphp-module-oidc && \
+    composer require simplesamlphp/simplesamlphp-module-oidc:dev-master && \
 	chown -R apache:apache /mnt/simplesamlphp && \
     rm -f /mnt/simplesamlphp/config/* && \
 	rm -f /mnt/simplesamlphp/metadata/* && \
